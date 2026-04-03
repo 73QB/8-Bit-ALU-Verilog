@@ -32,3 +32,13 @@ The design has been fully verified. Below is the simulation waveform:
 1. Open `ALU_8bit.qpf` in **Quartus Prime**.
 2. Run **RTL Simulation** to open Questa/ModelSim.
 3. In the ModelSim console, type `do wave.do` to load the waveform layout.
+
+---
+
+## 📜 Acknowledgments
+This project is an upgraded 8-bit version based on the original 4-bit ALU design by **Soumil Gupta**. 
+
+* **Original Project:** [Verilog-4-Bit-ALU](https://github.com/zyx7k/Verilog-4-Bit-ALU)
+* **Changes made:** * Expanded data width from 4-bit to 8-bit.
+    * Optimized the 8-bit comparator logic.
+    * Added custom testbench and waveform configuration for 8-bit verification.
