@@ -2,7 +2,7 @@
 
 This repository contains a gate-level and behavioral implementation of an **8-Bit Arithmetic Logic Unit (ALU)** designed using Verilog HDL. The project demonstrates hierarchical design principles, including custom decoders, enable blocks, and a **sequential FSM-based multiplier**.
 
-🚀 ## Features
+## 🚀 Features
 
 The ALU supports 5 distinct operation modes selected via a 3-bit control signal ($s_2, s_1, s_0$):
 
@@ -12,7 +12,7 @@ The ALU supports 5 distinct operation modes selected via a 3-bit control signal 
 4. **Sequential Multiplication (100):** 8-bit multiplication using the **Shift-and-Add algorithm** controlled by a **Finite State Machine (FSM)**.
    - Features a `done` flag and an 8-cycle calculation process.
 
-📂 ## Repository Structure
+## 📂 Repository Structure
 
 - `main_module.v`: Top-level entity integrating all sub-modules.
 - `multiplier_fsm.v`: Sequential multiplier logic with FSM (IDLE, CALC, DONE states).
@@ -24,25 +24,25 @@ The ALU supports 5 distinct operation modes selected via a 3-bit control signal 
 - `wave.do`: Pre-configured waveform format for ModelSim/QuestaSim.
 - `wave_result.png`: Simulation waveform results.
 
-🛠 ## Tools Used
+## 🛠 Tools Used
 
 - **Design & Synthesis:** Intel Quartus Prime.
 - **Simulation:** Questa Intel FPGA Edition / ModelSim.
 
-📊 ## Simulation Results
+## 📊 Simulation Results
 
 The design has been fully verified. Below is the simulation waveform showing various operations, including the 8-cycle multiplication process:
 
 ![ALU Simulation Waveform](wave_result.png)
 
-📖 ## How to Run
+## 📖 How to Run
 
 1. Open `ALU_8bit.qpf` in **Quartus Prime**.
 2. Run **RTL Simulation** to open Questa/ModelSim.
 3. In the ModelSim console, type `do wave.do` to load the professional waveform layout.
 4. Run the simulation using `run -all`.
 
-📜 ## Acknowledgments
+## 📜 Acknowledgments
 
 This project is an upgraded version based on the original 4-bit ALU design by **Soumil Gupta**.
 
