@@ -1,0 +1,45 @@
+module multiplier_fsm (
+    input clk, rst_n, start,
+    input [7:0] a, b,
+    output reg [15:0] res,
+    output reg done
+);
+    parameter IDLE = 2'b00, CALC = 2'b01, DONE = 2'b10;
+    reg [1:0] state;
+    reg [3:0] count;
+    reg [15:0] shift_a;
+    reg [7:0] shift_b;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= IDLE;
+            done <= 0;
+        end 
+		  else begin
+            case (state)
+                IDLE: begin
+                    done <= 0;
+                    if (start) begin
+                        shift_a <= {8'b0, a};
+                        shift_b <= b;
+                        res <= 0;
+                        count <= 0;
+                        state <= CALC;
+                    end
+                end
+                CALC: begin
+                    if (count < 8) begin
+                        if (shift_b[0]) res <= res + shift_a;
+                        shift_a <= shift_a << 1;
+                        shift_b <= shift_b >> 1;
+                        count <= count + 1;
+                    end else state <= DONE;
+                end
+                DONE: begin
+                    done <= 1;
+                    state <= IDLE;
+                end
+            endcase
+        end
+    end
+endmodule
