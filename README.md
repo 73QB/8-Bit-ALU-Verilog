@@ -51,3 +51,12 @@ This project is an upgraded version based on the original 4-bit ALU design by **
   - **Added a Sequential FSM Multiplier** (Shift-and-Add algorithm).
   - Optimized the 8-bit comparator logic.
   - Added custom testbench and `.do` configuration for professional verification.
+
+## 👨‍💻 About the Author
+
+**Lê Đức Tuấn**
+* **Education:** University of Science, VNU-HCM (Physics and Engineering Physics)
+* **Target Role:** IC Design Intern 
+* **Languages & Tools:** Verilog, ModelSim/QuestaSim, Intel Quartus
+* **English Proficiency:** TOEIC Listening & Reading - **790/990** *(Online result, hard copy pending)*
+* **Contact:** leductuan73qb@gmail.com
