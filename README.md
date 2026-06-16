@@ -39,7 +39,7 @@ The design has been fully verified. Below is the simulation waveform showing var
 
 1. Open `ALU_8bit.qpf` in **Quartus Prime**.
 2. Run **RTL Simulation** to open Questa/ModelSim.
-3. In the ModelSim console, type `do wave.do` to load the professional waveform layout.
+3. In the ModelSim console, type `do wave_main_module.do` to load the professional waveform layout.
 4. Run the simulation using `run -all`.
 
 ## 📜 Acknowledgments
