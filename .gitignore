@@ -1,15 +1,17 @@
-# Dọn rác Quartus
+# Bỏ qua các file backup
+*.bak
+
+# Bỏ qua các thư mục sinh ra khi biên dịch của Quartus
 db/
 incremental_db/
 output_files/
 simulation/
-*.bak
-*.qws
-*.rpt
-*.txt
-*.smsg
+greybox_tmp/
 
-# Dọn rác ModelSim/Questa
-transcript
-vsim.wlf
-work/
+# Bỏ qua các file tạm khác
+*.rpt
+*.smsg
+*.summary
+*.jdi
+*.pin
+*.qws

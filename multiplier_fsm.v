@@ -1,113 +1,138 @@
-module multiplier_fsm(
-    input clk, rst_n, start,
-    input [7:0] a, b,
-    output reg [15:0] res,
-    output reg done
+module multiplier_fsm
+
+#(
+	parameter N = 8
+)
+(
+	input clk,
+	input rst_n,
+	input start,
+	input[N - 1:0] a, b,
+	output reg [2*N - 1:0] res,
+	output reg done
 );
-    parameter IDLE = 2'b00, CALC = 2'b01, DONE = 2'b10;
-    reg [1:0] state;
-    reg [3:0] count;
 
-    reg C;          // Thanh ghi C (1 bit) chứa cờ nhớ
-    reg [7:0] A;    // Thanh ghi A (8 bit) chứa tổng 
-    reg [7:0] Q;    // Thanh ghi Q (8 bit) chứa số nhân
-    reg [7:0] M;    // Thanh ghi M (8 bit) chứa số bị nhân
+	parameter IDLE = 2'b00, CALC = 2'b01, DONE = 2'b10;
+	
+	reg [1:0] current_state, next_state;
+	
+	// Số vòng lặp dựa vào số bit truyền vào
+	reg [$clog2(N):0] count;
+	
+	reg [N - 1:0] A, Q, M;
+	
+	// Biến sum[N] chứa giá trị carry_out trong phép cộng
+	wire [N:0] sum;
 
-    // Khai báo dây sum 9-bit. Phép cộng A + M nếu tràn sẽ lòi ra bit thứ 9 (sum[8])
-    wire [8:0] sum;
-    assign sum = A + M; 
-
-    always @(posedge clk or negedge rst_n) 
-	 begin
-        if (!rst_n) 
-		  begin
-            state <= IDLE;
-            done <= 0;
-            res <= 0;
-            count <= 0;
-            C <= 0; A <= 0; Q <= 0; M <= 0; // Reset sạch sẽ
-        end
-		  
-        else 
-		  begin
-            case (state)
-                
-					 IDLE: 
-					 begin
-                    done <= 0;
-                    if (start) 
-						  begin
-                        C <= 1'b0;
-                        A <= 8'b0;
-                        Q <= b;     // Nạp số nhân vào Q
-                        M <= a;     // Nạp số bị nhân vào M
-                        count <= 0;
-								
-								// Thiết lập chế dộ tiếp theo cho hệ thống
-                        state <= CALC;
-                    end
-                end
-
-					 
-					 
-                CALC: 
-					 begin
-					 
-						  // Xét hết Q mới thoát lặp
-                    if (count < 8) 
-						  begin
-						  
-                        if (Q[0] == 1'b1) 
-								begin 
-									 // Sau khi thực hiện phép cộng trên sum
-									 // Dịch bit nhớ qua phải
-                            C <= 1'b0;               
-                            
-									 
-                            // Bit nhớ lúc này là MSB của A
-                            A <= {sum[8], sum[7:1]}; 
-                            
-                            
-									 // Bit LSB của sum bây giờ MSB của Q, bỏ LSB của Q
-                            Q <= {sum[0], Q[7:1]};   
-                        end 
-								
-								
-								
-								// Trường hợp Q[0] = 1'b0: Chỉ dịch, không cộng
-                        else 
-								begin
-                            
-                            C <= 1'b0;               
-                            A <= {C, A[7:1]};        
-                            Q <= {A[0], Q[7:1]};     
-                        end
-                        
-                        count <= count + 1;
-                    end
-						  
-						  // Khi lặp xong hết 8 vòng thì đặt trước trạng thái là done
-                    else 
-						  begin
-                        state <= DONE;
-                    end
-                end
-
-					 
-                DONE: 
-					 begin
-						  // đèn báo done đặt lên 1
-                    done <= 1;
-						  
-						  
-                    // Kết quả 16-bit: Ghép thanh ghi A và Q lại với nhau
-                    res <= {A, Q};
-						  
-						  
-						  // Đưa bộ tính toán về trạng thái ban đầu, lúc này done = 0
-                    state <= IDLE;
-                end
-            endcase
-        end
-    end
+	assign sum = A + M;
+	
+	
+	// Khối 1: Trái tim tuần tự
+	always @(posedge clk or negedge rst_n)
+	begin
+		if (!rst_n)
+		// Nếu nhấn nút restart => Reset về trạng thái ban đầu luôn
+		begin
+			current_state <= IDLE;
+		end
+		else
+		begin
+			current_state <= next_state;
+		end
+	end
+	
+	
+	// Khối 2: Định tuyến
+	always @(*)
+	begin
+		case (current_state)
+			IDLE:
+			begin
+				if (start)
+					next_state = CALC;
+				else
+					next_state = IDLE;
+			end
+			
+			CALC:
+			begin
+				if (count == N)
+					next_state = DONE;
+				else
+					next_state = CALC;
+			end
+			
+			// Nếu đã xong thì tự động chuyển về IDLE
+			DONE: next_state = IDLE;
+			
+			// Nếu bị lỗi thì tự động chuyển về IDLE
+			// Phòng hờ trường hợp 2'b11 cái mà chưa chứa giá trị gì
+			default: next_state = IDLE;
+		
+		endcase
+	end
+	
+	
+	// Khối 3: 
+	always @(posedge clk or negedge rst_n)
+	begin
+		// Khi nhan nut reset => Ep moi thu ve 0
+		if (!rst_n)
+		begin
+			done <= 1'b0;
+			res <= 0;
+			A <= 0;
+			Q <= 0;
+			M <= 0;
+			count <= 0;
+		end
+		
+		else
+		begin
+			case (current_state)
+				IDLE:
+				begin
+				// Đang ở phòng chờ thì tắt cờ hoàn thành
+					done <= 1'b0;
+						
+				// Khi nhấn nút start, nạp các giá trị ban đầu
+					if (start)
+					begin
+						A <= 0;
+						Q <= b;
+						M <= a;
+						count <= 0;
+					end
+				end
+				
+				
+				CALC:
+				begin
+				
+					if (count < N)
+					begin
+						if (Q[0] == 1'b1)
+						begin
+							A <= {sum[N], sum[N-1:1]};
+							Q <= {sum[0], Q[N-1:1]};
+						end
+						
+						else
+						begin
+							A <= {1'b0, A[N-1:1]};
+							Q <= {A[0], Q[N-1:1]};
+						end
+					end
+					count <= count + 1'b1;
+				end
+				
+				DONE:
+				begin
+					// Lúc này cờ done đang bật, khi chuyển qua IDLE phải có lệnh tắt cờ
+					done <= 1'b1;
+					res <= {A, Q};
+				end
+			endcase
+		end
+	end
 endmodule
